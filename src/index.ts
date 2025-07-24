@@ -1,16 +1,21 @@
 
-import { loadJson } from "./utils/handleData";
+import { loadJson, validateHouseData } from "./utils/handleData";
+import { calculateHeatLoss, calculatePowerHeatLoss } from "./utils/calculations";
 
 const pumpsData = loadJson("./data/heat-pumps.json");
 
 (async function run () {
   const housesData = loadJson(process.argv[2] || "./data/houses.json");
 
-  console.log({housesData, pumpsData})
+  for (const house of housesData) {
 
-  //for houses {
+    if (!validateHouseData(house)) {
+        console.error(`The data for submission ${house?.submissionId}, is invalid`);
+        continue;
+    }
 
-    //extract data from files
+    const heatLoss = calculateHeatLoss(house);
+    console.log(heatLoss)
 
     //calculate heatloss --- floorArea (m^2) * heatingFactor * insulationFactor = heat loss (kWh)
 
@@ -29,5 +34,5 @@ const pumpsData = loadJson("./data/heat-pumps.json");
 
     //output data
 
-  //for houses }
+  }
 })()

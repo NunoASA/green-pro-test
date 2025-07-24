@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { loadJson } from "./handleData";
+import { loadJson, validateHouseData } from "./handleData";
 
 jest.mock("fs");
 const mockedFs = fs as jest.Mocked<typeof fs>;
@@ -39,5 +39,25 @@ describe("loadJson", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+});
+
+describe("validateHouseData", () => {
+  const validHouse = {
+    submissionId: "e21a3149-b88c-40e9-86fd-c94a6b93cb78",
+    designRegion: "W Pennines (Ringway)",
+    floorArea: 92,
+    age: "1991 - 1995",
+    heatingFactor: 88,
+    insulationFactor: 1.1
+  };
+
+  test("should return true for valid house data", () => {
+    expect(validateHouseData(validHouse)).toBe(true);
+  });
+
+  test("should return false if some data is missing", () => {
+    const house = { ...validHouse, submissionId: undefined };
+    expect(validateHouseData(house as any)).toBe(false);
   });
 });
