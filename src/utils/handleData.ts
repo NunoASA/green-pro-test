@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 
+import { calculateTotalCosts } from "./calculations";
+
 type HouseData = {
   submissionId: string;
   designRegion: string;
@@ -41,4 +43,39 @@ export const validateHouseData = (house: HouseData)  => {
     typeof heatingFactor === "number" &&
     typeof insulationFactor === "number"
    )
+};
+
+export const processOutput = (
+  { house, heatLoss, powerHeatLoss, pump, error }:
+  {
+    house: HouseData,
+    heatLoss: { value: number, unit: string },
+    powerHeatLoss?: { value: number, unit: string },
+    pump?: any,
+    error?: string
+  }) => {
+  if (house) {
+    console.log(`Submission ID: ${house.submissionId}`)
+    console.log("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ")
+  }
+
+  if (heatLoss) {
+    console.log(`Estimated Heat Loss: ${heatLoss.value} ${heatLoss.unit}`)
+    console.log(`Design Region: ${house.designRegion}`)
+  }
+
+  if (powerHeatLoss) {
+    console.log(`Power Heat Loss: ${powerHeatLoss.value} ${powerHeatLoss.unit}`)
+
+    if (pump) {
+      console.log(`Recommended Heat Pump: ${pump.label}`);
+      console.log("Cost Breakdown:");
+      pump.costs.forEach((item: { label: string, cost: number }) => console.log(`   £${item.cost.toFixed(2)} - ${item.label}, `));
+      console.log(`Total Cost, including VAT = £${calculateTotalCosts(pump)}`);
+    }
+  }
+
+  if (error) {
+    console.log(`Warning: ${error}`)
+  }
 };
