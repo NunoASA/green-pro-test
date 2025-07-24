@@ -4,6 +4,8 @@ type HeatLossInput = {
   insulationFactor: number;
 };
 
+const VAT = 0.05;
+
 // floorArea (m^2) * heatingFactor * insulationFactor = heat loss (kWh)
 export const calculateHeatLoss = ({
   floorArea,
@@ -19,3 +21,9 @@ export const calculatePowerHeatLoss = (heatLoss: number, degreeDays: number): { 
   value: Number((heatLoss / degreeDays).toFixed(2)),
   unit: "kW"
 });
+
+export const calculateTotalCosts = (pump: any, vat = VAT) => {
+  const subtotal = pump.costs.reduce((total: number, { cost }: { cost: number }) => total + cost, 0);
+
+  return (subtotal * (1 + vat)).toFixed(2);
+};

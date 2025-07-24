@@ -1,6 +1,6 @@
 
 import { loadJson, validateHouseData } from "./utils/handleData";
-import { calculateHeatLoss, calculatePowerHeatLoss } from "./utils/calculations";
+import { calculateHeatLoss, calculatePowerHeatLoss, calculateTotalCosts } from "./utils/calculations";
 import { getWeather } from "./utils/weatherAPI";
 import { findPump } from "./utils/findPump";
 
@@ -38,6 +38,7 @@ import { findPump } from "./utils/findPump";
     }
 
     console.log(pump.label)
+    console.log(calculateTotalCosts(pump))
 
     //find pump
         //if not found "warning", return
