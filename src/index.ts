@@ -1,6 +1,7 @@
 
 import { loadJson, validateHouseData } from "./utils/handleData";
 import { calculateHeatLoss, calculatePowerHeatLoss } from "./utils/calculations";
+import { getWeather } from "./utils/weatherAPI";
 
 const pumpsData = loadJson("./data/heat-pumps.json");
 
@@ -8,6 +9,8 @@ const pumpsData = loadJson("./data/heat-pumps.json");
   const housesData = loadJson(process.argv[2] || "./data/houses.json");
 
   for (const house of housesData) {
+    console.log("--------------------------------------------------")
+
 
     if (!validateHouseData(house)) {
         console.error(`The data for submission ${house?.submissionId}, is invalid`);
@@ -15,17 +18,19 @@ const pumpsData = loadJson("./data/heat-pumps.json");
     }
 
     const heatLoss = calculateHeatLoss(house);
-    console.log(heatLoss)
 
-    //calculate heatloss --- floorArea (m^2) * heatingFactor * insulationFactor = heat loss (kWh)
+    const data = await getWeather(house.designRegion);
 
-    //fetch weather data and get "degreeDays"
-        //if 404 "warning", return
+    if (data?.error) {
+        console.log(`Estimated Heat Loss: ${heatLoss.value} ${heatLoss.unit}`)
+        console.log(`Warning: ${data.error}`)
+        continue;
+    }
 
-        //if error, handle and return
+    const powerHeatLoss = calculatePowerHeatLoss(heatLoss.value, data.location.degreeDays);
 
-    //calculate powerHeatLoss  --- heat loss (kWh) / heating degree days = Power heat loss (kW)
-
+    console.log({ heatLoss, powerHeatLoss })
+    
     //find pump
         //if not found "warning", return
 
