@@ -2,8 +2,7 @@
 import { loadJson, validateHouseData } from "./utils/handleData";
 import { calculateHeatLoss, calculatePowerHeatLoss } from "./utils/calculations";
 import { getWeather } from "./utils/weatherAPI";
-
-const pumpsData = loadJson("./data/heat-pumps.json");
+import { findPump } from "./utils/findPump";
 
 (async function run () {
   const housesData = loadJson(process.argv[2] || "./data/houses.json");
@@ -30,7 +29,16 @@ const pumpsData = loadJson("./data/heat-pumps.json");
     const powerHeatLoss = calculatePowerHeatLoss(heatLoss.value, data.location.degreeDays);
 
     console.log({ heatLoss, powerHeatLoss })
+
+    const pump = findPump(powerHeatLoss.value);
     
+    if (pump?.error) {
+        console.log(`Warning: ${pump.error}`)
+        continue;
+    }
+
+    console.log(pump.label)
+
     //find pump
         //if not found "warning", return
 
